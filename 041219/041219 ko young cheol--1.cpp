@@ -1,0 +1,416 @@
+/*
+Name: young cheol ko
+Class: CS52
+Lab #: 6
+Compiler Used: visual studio 2017 community
+Operating System Used: windows 10
+Date and Time of Last successful Compilation: 4/14 13:37
+Date and Time of when program verified all test results: 4/14 13:22
+*/
+
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <sstream>
+#include <cmath>
+using namespace std;
+
+class Quadratic
+{
+private:
+	int A;
+	int B;
+	int C;
+	bool isLinear;
+	bool isEquation;
+public:
+	Quadratic();
+	Quadratic(int in_a, int in_b, int in_c);
+	int getCeffXSquare() const;
+	int getCoeffOfX()const;
+	int getConstant() const;
+	void getRealRoots(double &root1, double & root2)const;
+	void getRealPartAndImagPart(double & Real, double & Imag)const;
+	const string toString() const;
+	friend const Quadratic operator + (const Quadratic & left, const Quadratic & right);
+	friend const Quadratic operator - (const Quadratic & left, const Quadratic & right);
+	friend const Quadratic operator *(int multiplier, const  Quadratic & Original);
+	double Value(double IN_X)const;
+	friend bool operator == (const Quadratic & left, const Quadratic & right);
+	friend bool operator != (const Quadratic & left, const Quadratic & right);
+	static int GCD(int a, int b);
+};
+Quadratic::Quadratic()
+{
+	A = 0;
+	B = 0;
+	C = 0;
+	isLinear = false;
+	isEquation = false;
+}
+Quadratic::Quadratic(int in_a, int in_b, int in_c)
+{
+	A = in_a;
+	B = in_b;
+	C = in_c;
+	if (A == 0 && B == 0) {
+		isEquation = false;
+	}
+	if (A != 0 || B != 0) {
+		isEquation = true;
+		if (A == 0 && B != 0) {
+			isLinear = true;
+		}
+	}
+	
+}
+int Quadratic::getCeffXSquare()const
+{
+	return A;
+}
+int   Quadratic::getCoeffOfX()const
+{
+	return B;
+}
+
+int Quadratic::getConstant() const
+{
+	return C;
+}
+void Quadratic::getRealRoots(double & root1, double & root2)const
+{
+	if (A==0){
+		root1 = (-C) / static_cast<double> (B);
+	}
+	else {
+		double D = (pow(B, 2) - (4 * A * C));
+		if (D > 0) {
+			root1 = (-B + sqrt(D)) / static_cast<double>(2 * A);
+			root2 = (-B - sqrt(D)) / static_cast<double>(2 * A);
+		}
+		else if (D == 0) {
+			root1 = (-B + sqrt(D)) / static_cast<double>(2 * A);
+			root2 = root1;
+		}
+	}
+	
+}
+void Quadratic::getRealPartAndImagPart(double & Real, double & Imag)const
+{
+	double D = (pow(B, 2) - (4 * A * C));
+	if (D < 0) {
+		Real = (-B) / static_cast<double>(2 * A);
+		Imag = sqrt(abs(D)) / static_cast<double>(2 * A);
+	}
+}
+
+const string Quadratic::toString() const
+{
+	ostringstream buffer;
+	buffer << fixed << showpoint << setprecision(4)<<scientific;
+	double x = 0;
+	double y = 0;
+	if (isEquation == false) {
+		buffer << "You do not have an equation." << endl;
+	}
+	else if (isLinear == true) {
+
+		buffer << "The original Equation :" << endl;
+		if (B == 1) {
+			buffer << "X ";
+		}
+		else {
+			buffer << getCoeffOfX() << "*X ";
+		}
+		if (C >= 0) {
+			buffer << "+" << getConstant();
+		}
+		else {
+			buffer << getConstant();
+		}
+		buffer << " = 0" << endl;
+
+		getRealRoots(x, y);
+		buffer << "Linear Solution is : X1 = " << x << endl;
+	}
+	else {
+		buffer << "The original Equation :" << endl;
+		if (A == 1) {
+			buffer << "X^2 ";
+		}
+		else {
+			buffer << getCeffXSquare() << "*X^2 ";
+		}
+		if (B >= 0) {
+			buffer << "+";
+			if (B == 1) {
+				buffer << "X ";
+			}
+			else {
+				buffer << getCoeffOfX() << "X ";
+			}
+		}
+		else {
+			buffer << getCoeffOfX() << "X ";
+		}
+		if (C >= 0) {
+			buffer << "+" << getConstant();
+		}
+		else {
+			buffer << getConstant();
+		}
+		buffer << " = 0" << endl;
+
+		double D = (pow(B, 2) - (4 * A * C));
+		if (D > 0) {
+			getRealRoots(x, y);
+			buffer << "Two Positive roots are :" << endl
+				<< "X1 = " << x << endl
+				<< "X2 = " << y << endl;
+		}
+		else if (D == 0) {
+			getRealRoots(x, y);
+			buffer << "One Positive root is :" << endl
+				<< "X1 = " << x << endl;
+		}
+		else if (D < 0) {
+			getRealPartAndImagPart(x, y);
+			buffer << "Two complex number roots are" << endl
+				<< "X1 = " << x << " - I * (" << y << ")" << endl
+				<< "X2 = " << x << " + I * (" << y << ")" << endl;
+		}
+	}
+	buffer << "======================== = " << endl;
+		
+	return buffer.str();
+}
+const Quadratic operator + (const Quadratic & left, const Quadratic & right)
+{
+	Quadratic Q(left.A + right.A, left.B + right.B, left.C + right.C);
+	return Q;
+}
+const Quadratic operator - (const Quadratic & left, const Quadratic & right)
+{
+	Quadratic Q(left.A - right.A, left.B - right.B, left.C - right.C);
+	return Q;
+}
+const Quadratic operator *(int multiplier, const  Quadratic & Original)
+{
+	Quadratic Q(Original.A*multiplier, Original.B * multiplier, Original.C * multiplier);
+	return Q;
+}
+double Quadratic::Value(double IN_X)const
+{
+	double x;
+	x = A * (IN_X * IN_X) + B * IN_X + C;
+	return x;
+}
+int Quadratic::GCD(int a, int b)
+{
+	a = abs(a);
+	b = abs(b);
+	int c;
+	while (true) {
+		c = a % b;
+		if (0 == c)
+			break;
+		a = b;
+		b = c;
+	}
+	return b;
+}
+bool operator == (const Quadratic & left, const Quadratic & right)
+{
+	Quadratic Q = left;
+	Quadratic W = right;
+	int gcdr = Quadratic::GCD(Quadratic::GCD(left.A, left.B), left.C);
+	Q.A = Q.A / gcdr;
+	Q.B = Q.B / gcdr;
+	Q.C = Q.C / gcdr;
+	int gcdl = Quadratic::GCD(Quadratic::GCD(right.A, right.B), right.C);
+	W.A = W.A / gcdl;
+	W.B = W.B / gcdl;
+	W.C = W.C / gcdl;
+	return (Q.A == W.A && Q.B == W.B && Q.C == W.C);
+}
+bool operator != (const Quadratic & left, const Quadratic & right)
+{
+	return !(left == right);
+}
+int main(int argc, const char * argv[])
+{
+	try
+	{
+		Quadratic Q1(2, -5, -3);
+		cout << Q1.toString();
+		Quadratic Q2(2, -5, 4);
+		cout << Q2.toString();
+		Quadratic Q3(1, -8, 16);
+		cout << Q3.toString();
+		Quadratic Q4(4, 0, 0);
+		cout << Q4.toString();
+		Quadratic Q5(4, 0, 25);
+		cout << Q5.toString();
+		Quadratic Q6(0, 2, -7);
+		cout << Q6.toString();
+		Quadratic Q7(0, 0, -7);
+		cout << Q7.toString();
+		Quadratic Q8(2, 4, 0);
+		cout << Q8.toString();
+		Quadratic Q9(1, 1, 1);
+		cout << Q9.toString();
+		Quadratic Q10 = Q1 + Q2;
+		cout << Q10.toString();
+		Quadratic Q11 = 5 * Q1;
+		cout << Q11.toString();
+		Quadratic Q12 = Q2 - Q3;
+		cout << Q12.toString();
+		cout << Q1.Value(1) << endl;
+		Quadratic Q13(0, 1, 2);
+		Quadratic Q14 = Q13 + Q1;
+		cout << Q14.toString();
+		Quadratic Q15(0, 3, 4);
+		cout << Q15.toString();
+		Quadratic Q16 = Q13 + Q15;
+		cout << "Q16 = Q13 + Q15" << endl;
+		cout << Q16.toString();
+		Quadratic Q17(0, -5, 0);
+		cout << Q17.toString();
+		Quadratic Q18(0, 6, 0);
+		cout << Q18.toString();
+		//GCD tests
+		cout << "+++ GCD Tests+++++++++++++\n";
+		int gcd1 = Quadratic::GCD(1, 2);
+		cout << "GCD of 1, 2 = " << gcd1 << endl;
+		int gcd2 = Quadratic::GCD(3, 6);
+		cout << "GCD of 3, 6 = " << gcd2 << endl;
+		int gcd3 = Quadratic::GCD(-12, 24);
+		cout << "GCD of -12, 24 = " << gcd3 << endl;
+		int gcd4 = Quadratic::GCD(-12, -24);
+		cout << "GCD of -12, -24 = " << gcd4 << endl;
+		int gcd5 = Quadratic::GCD(12, -24);
+		cout << "GCD of 12, -24 = " << gcd5 << endl;
+		cout << boolalpha;
+		cout << (Q1 == Q11) << endl;
+		cout << (Q1 == Q1) << endl;
+		cout << (Q1 == Q2) << endl;
+
+		cout << (Q1 != Q11) << endl;
+		cout << (Q1 != Q1) << endl;
+		cout << (Q1 != Q2) << endl;
+		
+	}
+	catch (...)
+	{
+		cout << "An exception has been thrown. This will disappear when all class member function bodies are filled and throw statement is removed." << endl;
+	}
+	system("pause");
+
+	return 0;
+}
+/*
+ Outut
+ The original Equation:
+ 2*X^2   - 5X  - 3 = 0
+ Two Positive roots are:
+ X1 = 3.0000e+00
+ X2 = -5.0000e-01
+ ==========================================
+ The original Equation:
+ 2*X^2   - 5X  + 4 = 0
+ Two complex number roots are
+ X1 = 1.2500e+00 - I* (6.6144e-01 )
+ X2 = 1.2500e+00 + I* (6.6144e-01 )
+
+ ==========================================
+ The original Equation:
+ X^2   - 8X  + 16 = 0
+ One Positive root is:
+ X1 = 4.0000e+00
+ ==========================================
+ The original Equation:
+ 4*X^2   + 0*X   + 0 = 0
+ One Positive root is:
+ X1 = 0.0000e+00
+ ==========================================
+ The original Equation:
+ 4*X^2   + 0*X   + 25 = 0
+ Two complex number roots are
+ X1 = 0.0000e+00 - I* (2.5000e+00 )
+ X2 = 0.0000e+00 + I* (2.5000e+00 )
+
+ ==========================================
+ The original Equation:
+ 2*X -7 = 0
+ Linear Solution is: X1 = 3.5000e+00
+ ==========================================
+ You do not have an equation.
+ ==========================================
+ The original Equation:
+ 2*X^2   + 4*X   + 0 = 0
+ Two Positive roots are:
+ X1 = 0.0000e+00
+ X2 = -2.0000e+00
+ ==========================================
+ The original Equation:
+ X^2   + X  + 1 = 0
+ Two complex number roots are
+ X1 = -5.0000e-01 - I* (8.6603e-01 )
+ X2 = -5.0000e-01 + I* (8.6603e-01 )
+
+ ==========================================
+ The original Equation:
+ 4*X^2   - 10X  + 1 = 0
+ Two Positive roots are:
+ X1 = 2.3956e+00
+ X2 = 1.0436e-01
+ ==========================================
+ The original Equation:
+ 10*X^2   - 25X  - 15 = 0
+ Two Positive roots are:
+ X1 = 3.0000e+00
+ X2 = -5.0000e-01
+ ==========================================
+ The original Equation:
+ X^2   + 3*X   - 12 = 0
+ Two Positive roots are:
+ X1 = 2.2749e+00
+ X2 = -5.2749e+00
+ ==========================================
+ -6
+ The original Equation:
+ 2*X^2   - 4X  - 1 = 0
+ Two Positive roots are:
+ X1 = 2.2247e+00
+ X2 = -2.2474e-01
+ ==========================================
+ The original Equation:
+ 3*X  + 4 = 0
+ Linear Solution is: X1 = -1.3333e+00
+ ==========================================
+ Q16 = Q13 + Q15
+ The original Equation:
+ 4*X  + 6 = 0
+ Linear Solution is: X1 = -1.5000e+00
+ ==========================================
+ The original Equation:
+ -5*X  + 0 = 0
+ Linear Solution is: X1 = -0.0000e+00
+ ==========================================
+ The original Equation:
+ 6*X  + 0 = 0
+ Linear Solution is: X1 = 0.0000e+00
+ ==========================================
+ +++ GCD Tests+++++++++++++
+ GCD of 1, 2 = 1
+ GCD of 3, 6 = 3
+ GCD of -12, 24 = 12
+ GCD of -12, -24 = 12
+ GCD of 12, -24 = 12
+ true
+ true
+ false
+ false
+ false
+ true
+ */
